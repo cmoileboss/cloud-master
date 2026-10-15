@@ -1,0 +1,17 @@
+# PostgreSQL local pour le développement. Le backend et le frontend se lancent hors Docker (voir README).
+name: ffk-cloud-lab
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ffk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ffk-local-only}
+      POSTGRES_DB: ${POSTGRES_DB:-ffk}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

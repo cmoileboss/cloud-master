@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Réunion de la CSDGE — suivi des dossiers",
+    "in_days": 21,
+    "start_time": "10:00",
+    "end_time": "12:00",
+    "location": "Salle de réunion du siège — lieu fictif",
+    "recipients": ["Membres de la commission — liste fictive"],
+    "agenda": ["Suivi des dossiers", "Préparation des prochaines sessions", "Questions diverses"],
+    "confirm_days_before": 4,
+    "contact": "secretariat-grades@ffk.example"
+  },
+  {
+    "title": "Réunion de la CSDGE — bilan des sessions",
+    "in_days": 56,
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "location": "Visioconférence — https://reunion.ffk.example/bilan",
+    "recipients": ["Membres de la commission — liste fictive", "Responsables régionaux invités — liste fictive"],
+    "agenda": ["Bilan des sessions", "Calendrier de la prochaine saison", "Points à suivre"],
+    "confirm_days_before": 4,
+    "contact": "secretariat-grades@ffk.example"
+  }
+]
