@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://ffk:ffk-local-only@127.0.0.1:5433/ffk"
     data_dir: Path = BACKEND_DIR / "data"
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "https://witty-sand-0bf85c10f.3.azurestaticapps.net"
 
     llm_base_url: str = ""
     llm_model: str = ""
