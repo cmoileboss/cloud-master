@@ -63,8 +63,10 @@ class LLMService:
         settings = self.settings
         api_key = settings.llm_api_key.get_secret_value()
         if not (settings.llm_base_url and settings.llm_model and api_key):
+            logger.warning("llm_not_configured prompt=%s", prompt_name)
             raise LLMError("LLM non configuré : renseignez LLM_BASE_URL, LLM_MODEL et LLM_API_KEY.", 503)
         if settings.llm_base_url.rstrip("/").endswith("/chat/completions"):
+            logger.warning("llm_bad_base_url base_url=%s", settings.llm_base_url)
             raise LLMError(
                 "LLM_BASE_URL doit s'arrêter avant « /chat/completions » (ex. https://fournisseur/v1) : "
                 "le SDK ajoute ce chemin lui-même.",
@@ -76,6 +78,7 @@ class LLMService:
         prompt += f"\n\nRéponds uniquement avec un objet JSON conforme à ce schéma :\n{schema}"
 
         started = time.perf_counter()
+        logger.info("llm_call prompt=%s model=%s", prompt_name, settings.llm_model)
         try:
             with OpenAI(base_url=settings.llm_base_url, api_key=api_key, timeout=60, max_retries=0) as client:
                 response = client.chat.completions.create(

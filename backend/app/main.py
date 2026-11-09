@@ -12,9 +12,11 @@ from app.routes import documents, health
 from app.storage import LocalStorage
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger("ffk.app")
 
 
 def llm_error_response(request: Request, exc: LLMError):
+    logger.warning("llm_error path=%s status=%s message=%s", request.url.path, exc.status_code, exc.message)
     return JSONResponse({"detail": exc.message}, status_code=exc.status_code)
 
 
@@ -25,9 +27,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        logger.info("startup storage_dir=%s cors_origins=%s", settings.data_dir / "documents", settings.cors_origin_list)
+        if not (settings.llm_base_url and settings.llm_model and settings.llm_api_key.get_secret_value()):
+            logger.warning("llm_not_configured: renseignez LLM_BASE_URL, LLM_MODEL et LLM_API_KEY")
         init_db(engine)
         yield
         engine.dispose()
+        logger.info("shutdown")
 
     app = FastAPI(title="FFK — Convocations", lifespan=lifespan)
 

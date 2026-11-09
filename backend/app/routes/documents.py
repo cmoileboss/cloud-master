@@ -29,12 +29,15 @@ def list_documents(db: DB):
 def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, storage: Storage):
     """Le LLM choisit une réunion du calendrier et rédige l'introduction ; le reste vient du calendrier."""
     meetings = load_meetings()
+    logger.info("generate_start request_length=%d meetings=%d", len(body.request), len(meetings))
     choice = llm.choose_meeting(body.request, meetings)
     if choice.meeting_id is None:
+        logger.info("generate_clarification_needed")
         return ConvocationResult(clarification=choice.clarification)
 
     meeting = next((m for m in meetings if m.id == choice.meeting_id), None)
     if meeting is None:
+        logger.warning("generate_unknown_meeting meeting_id=%s", choice.meeting_id)
         raise HTTPException(502, "L'IA a choisi une réunion absente du calendrier. Précisez la demande.")
 
     document_id = uuid4().hex
@@ -54,6 +57,7 @@ def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, storage: St
     db.add(document)
     db.commit()
     db.refresh(document)
+    logger.info("generate_ok document_id=%s meeting_id=%s", document.id, meeting.id)
     return ConvocationResult(document=document, meeting=meeting, text=choice.text)
 
 
@@ -61,6 +65,7 @@ def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, storage: St
 def download_document(document_id: str, db: DB, storage: Storage):
     document = db.get(Document, document_id)
     if document is None:
+        logger.warning("download_not_found document_id=%s", document_id)
         raise HTTPException(404, "Document introuvable.")
     try:
         content = storage.get(document.storage_key)

@@ -1,3 +1,4 @@
+import logging
 from io import BytesIO
 from xml.sax.saxutils import escape
 
@@ -9,6 +10,8 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 from app.models import Meeting
+
+logger = logging.getLogger("ffk.pdf")
 
 
 def date_fr(value):
@@ -77,5 +80,11 @@ def render_convocation(meeting: Meeting, text: str) -> bytes:
         title=f"Convocation - {meeting.title}",
         author="Service des Grades - atelier pédagogique",
     )
-    document.build(elements, onFirstPage=footer, onLaterPages=footer)
-    return buffer.getvalue()
+    try:
+        document.build(elements, onFirstPage=footer, onLaterPages=footer)
+    except Exception:
+        logger.exception("pdf_render_failed meeting_id=%s", meeting.id)
+        raise
+    content = buffer.getvalue()
+    logger.info("pdf_rendered meeting_id=%s size=%d", meeting.id, len(content))
+    return content

@@ -1,7 +1,11 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import text
 
 from app.deps import DB
+
+logger = logging.getLogger("ffk.health")
 
 router = APIRouter(prefix="/health", tags=["santé"])
 
@@ -18,5 +22,6 @@ def ready(db: DB):
     try:
         db.exec(text("SELECT 1"))
     except Exception:
+        logger.exception("readiness_failed")
         raise HTTPException(503, "Base de données indisponible.")
     return {"status": "ok"}
