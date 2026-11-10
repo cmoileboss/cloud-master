@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from sqlmodel import select
 
-from app.deps import DB, LLM, Storage, BlobStorage
+from app.deps import DB, LLM, BlobStorage
 from app.meetings import load_meetings
 from app.models import ConvocationRequest, ConvocationResult, Document, Meeting
 from app.pdf import render_convocation
@@ -26,7 +26,7 @@ def list_documents(db: DB):
 
 
 @router.post("/documents/generate", response_model=ConvocationResult)
-def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, blob_storage: BlobStorage): # storage: Storage):
+def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, blob_storage: BlobStorage):
     """Le LLM choisit une réunion du calendrier et rédige l'introduction ; le reste vient du calendrier."""
     meetings = load_meetings()
     logger.info("generate_start request_length=%d meetings=%d", len(body.request), len(meetings))
@@ -63,7 +63,7 @@ def generate_convocation(body: ConvocationRequest, db: DB, llm: LLM, blob_storag
 
 
 @router.get("/documents/{document_id}/download")
-def download_document(document_id: str, db: DB, blob_storage: BlobStorage): # storage: Storage):
+def download_document(document_id: str, db: DB, blob_storage: BlobStorage):
     document = db.get(Document, document_id)
     if document is None:
         logger.warning("download_not_found document_id=%s", document_id)
