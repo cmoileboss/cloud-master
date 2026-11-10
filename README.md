@@ -177,6 +177,9 @@ Les tests utilisent SQLite et un faux LLM : ils n'ont besoin ni de PostgreSQL, n
   `backend` : `uvicorn app.main:app --host 0.0.0.0 --port <port imposé par l'hébergeur>`. Les dossiers
   `prompts/` et `fixtures/` doivent être déployés avec `app/`.
 - **Frontend** : le contenu de `frontend/dist` (après `npm run build`) est un site statique.
+- **CI/CD** : le déploiement Azure du backend dépend des vérifications backend ; celui du frontend
+  dépend du workflow « Frontend build ». Un échec bloque le déploiement correspondant. Sur `main`,
+  ces vérifications tournent aussi séparément lors du `push`.
 - **Stockage des PDF** : `backend/app/storage.py` écrit dans un dossier local, qui disparaît à chaque
   redéploiement ou redémarrage sur la plupart des hébergements. Une autre classe avec les mêmes méthodes
   `put(key, content)` et `get(key)` peut la remplacer : il suffit de changer l'instanciation dans
