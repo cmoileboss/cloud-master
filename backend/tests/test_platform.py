@@ -2,8 +2,9 @@
 
 import pytest
 
+import app.storage as storage_module
 from app.config import Settings
-from app.storage import LocalStorage
+from app.storage import BlobStorage, LocalStorage
 
 
 def test_health_endpoints(client):
@@ -32,3 +33,43 @@ def test_local_storage_round_trip(tmp_path):
 def test_local_storage_rejects_path_escape(tmp_path):
     with pytest.raises(ValueError):
         LocalStorage(tmp_path).get("../../secret.txt")
+
+
+def test_blob_storage_uses_azure_client(monkeypatch):
+    class FakeContainer:
+        def __init__(self):
+            self.upload = None
+
+        def upload_blob(self, **kwargs):
+            self.upload = kwargs
+
+        def download_blob(self, key):
+            assert key == "doc.pdf"
+            return type("FakeBlob", (), {"readall": lambda self: b"%PDF-test"})()
+
+    container = FakeContainer()
+    client_options = {}
+
+    class FakeBlobServiceClient:
+        def __init__(self, account_url, credential):
+            client_options.update(account_url=account_url, credential=credential)
+
+        def get_container_client(self, container_name):
+            assert container_name == "documents"
+            return container
+
+    monkeypatch.setattr(storage_module, "BlobServiceClient", FakeBlobServiceClient)
+    monkeypatch.setattr(storage_module, "DefaultAzureCredential", lambda: "fake-credential")
+
+    storage = BlobStorage("https://account.blob.core.windows.net", "documents")
+    storage.put("doc.pdf", b"%PDF-test")
+
+    assert client_options == {
+        "account_url": "https://account.blob.core.windows.net",
+        "credential": "fake-credential",
+    }
+    assert container.upload["name"] == "doc.pdf"
+    assert container.upload["data"] == b"%PDF-test"
+    assert container.upload["overwrite"] is True
+    assert container.upload["content_settings"].content_type == "application/pdf"
+    assert storage.get("doc.pdf") == b"%PDF-test"

@@ -27,6 +27,7 @@ dev = [
   "httpx>=0.28,<1",    # client HTTP utilisé par TestClient (FastAPI)
   "httpx2>=2,<3",      # client HTTP utilisé par le SDK openai, simulé dans test_llm.py
   "pypdf>=5,<7",
+  "pylint>=3,<4",
   "ruff>=0.12,<1",
 ]
 

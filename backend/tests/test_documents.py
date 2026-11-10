@@ -62,11 +62,11 @@ def test_invented_meeting_is_rejected(client, fake_llm):
     assert client.get("/api/documents").json() == []
 
 
-def test_storage_failure_creates_no_document(client, app, fake_llm):
+def test_blob_storage_failure_creates_no_document(client, app, fake_llm):
     def storage_down(key, content):
         raise OSError("secret-connection-string")
 
-    app.state.storage.put = storage_down
+    app.state.blob_storage.put = storage_down
     response = generate(client)
     assert response.status_code == 502
     assert "Stockage" in response.json()["detail"]
@@ -78,9 +78,11 @@ def test_unknown_document_returns_404(client):
     assert client.get("/api/documents/inconnu/download").status_code == 404
 
 
-def test_documents_survive_a_restart(client, settings, fake_llm):
+def test_documents_survive_a_restart(client, settings, blob_storage, fake_llm):
     document = generate(client).json()["document"]
 
-    with TestClient(create_app(settings)) as restarted:
+    restarted_app = create_app(settings)
+    restarted_app.state.blob_storage = blob_storage
+    with TestClient(restarted_app) as restarted:
         assert [doc["id"] for doc in restarted.get("/api/documents").json()] == [document["id"]]
         assert restarted.get(f"/api/documents/{document['id']}/download").status_code == 200
