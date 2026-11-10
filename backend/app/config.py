@@ -20,7 +20,6 @@ class Settings(BaseSettings):
 
     azure_storage_account_url: str = ""
     azure_storage_container: str = ""
-    azure_client_id: str = ""
 
     llm_base_url: str = ""
     llm_model: str = ""
