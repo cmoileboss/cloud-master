@@ -9,7 +9,7 @@ from app.config import Settings
 from app.database import init_db, make_engine
 from app.llm import LLMError, LLMService
 from app.routes import documents, health
-from app.storage import LocalStorage, BlobStorage
+from app.storage import BlobStorage
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("ffk.app")
@@ -40,7 +40,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Services partagés, fournis aux routes par app/deps.py.
     app.state.engine = engine
     app.state.llm = LLMService(settings)
-    app.state.storage = LocalStorage(settings.data_dir / "documents")
     app.state.blob_storage = BlobStorage(settings.azure_storage_account_url, settings.azure_storage_container)
 
     app.add_middleware(
