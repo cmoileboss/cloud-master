@@ -21,8 +21,10 @@ def get_llm(request: Request) -> LLMService:
 def get_storage(request: Request) -> LocalStorage:
     return request.app.state.storage
 
+
 def get_blob_storage(request: Request) -> BlobStorage:
     return request.app.state.blob_storage
+
 
 DB = Annotated[Session, Depends(get_db)]
 LLM = Annotated[LLMService, Depends(get_llm)]

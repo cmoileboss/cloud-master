@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     cors_origins: str = "https://witty-sand-0bf85c10f.3.azurestaticapps.net"
 
     azure_storage_account_url: str = ""
-    azure_storage_container: str = "documents"
+    azure_storage_container: str = ""
     azure_client_id: str = ""
 
     llm_base_url: str = ""
