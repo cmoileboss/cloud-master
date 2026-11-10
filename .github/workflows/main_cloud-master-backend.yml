@@ -12,7 +12,7 @@ on:
 
 jobs:
   checks:
-    uses: ./.github/workflows/quality-check_frontend-construction.yml
+    uses: ./.github/workflows/backend-quality-check.yml
     permissions:
       contents: read
 
