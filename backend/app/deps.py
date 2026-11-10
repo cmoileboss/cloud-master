@@ -6,7 +6,7 @@ from fastapi import Depends, Request
 from sqlmodel import Session
 
 from app.llm import LLMService
-from app.storage import LocalStorage
+from app.storage import LocalStorage, BlobStorage
 
 
 def get_db(request: Request):
@@ -21,7 +21,10 @@ def get_llm(request: Request) -> LLMService:
 def get_storage(request: Request) -> LocalStorage:
     return request.app.state.storage
 
+def get_blob_storage(request: Request) -> BlobStorage:
+    return request.app.state.blob_storage
 
 DB = Annotated[Session, Depends(get_db)]
 LLM = Annotated[LLMService, Depends(get_llm)]
 Storage = Annotated[LocalStorage, Depends(get_storage)]
+BlobStorage = Annotated[BlobStorage, Depends(get_blob_storage)]

@@ -17,6 +17,8 @@ dependencies = [
   "openai>=3,<4",
   "tzdata>=2025",
   "reportlab>=4.2,<5",
+  "azure-storage-blob>=12.19,<13",
+  "azure-identity>=1.16,<2",
 ]
 
 [project.optional-dependencies]

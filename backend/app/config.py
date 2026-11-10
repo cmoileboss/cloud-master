@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     data_dir: Path = BACKEND_DIR / "data"
     cors_origins: str = "https://witty-sand-0bf85c10f.3.azurestaticapps.net"
 
+    azure_storage_account_url: str = ""
+    azure_storage_container: str = "documents"
+    azure_client_id: str = ""
+
     llm_base_url: str = ""
     llm_model: str = ""
     llm_api_key: SecretStr = SecretStr("")
